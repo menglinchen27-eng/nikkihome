@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>无限暖暖家园助手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #fdf6f6; }
+        .item { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 8px; background: white; }
+        .result { position: sticky; bottom: 20px; background: #ffb7c5; color: white; padding: 15px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>🏠 家具材料计算器</h2>
+        <div v-for="item in furnitureList" :key="item.name" class="item">
+            <span>{{ item.name }}</span>
+            <input type="number" v-model.number="selection[item.name]" min="0" style="float:right; width:50px;">
+        </div>
+
+        <div class="result" v-if="Object.keys(totalMaterials).length > 0">
+            <h3>所需总材料：</h3>
+            <div v-for="(count, mat) in totalMaterials">{{ mat }}: {{ count }}</div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    furnitureList: furnitureData,
+                    selection: {}
+                }
+            },
+            computed: {
+                totalMaterials() {
+                    let res = {};
+                    for (let name in this.selection) {
+                        let count = this.selection[name];
+                        if (count > 0) {
+                            let item = this.furnitureList.find(f => f.name === name);
+                            for (let mat in item.materials) {
+                                res[mat] = (res[mat] || 0) + (item.materials[mat] * count);
+                            }
+                        }
+                    }
+                    return res;
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
